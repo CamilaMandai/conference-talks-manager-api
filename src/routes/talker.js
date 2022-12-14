@@ -6,12 +6,33 @@ const writeData = require('../utils/writeData');
 const router = express.Router();
 const dataPath = path.resolve('src', 'talker.json');
 
+const tokenValidation = (req, res, next) => {
+  const { authorization } = req.headers;
+  if (!authorization) {
+    return res.status(401).json({ message: 'Token não encontrado' });
+  }
+  if (authorization.length !== 16 || typeof authorization !== 'string') {
+    return res.status(401).json({ message: 'Token inválido' });
+  }
+  next();
+};
+
 router.get('/', async (req, res) => {
   const result = await readFile(dataPath);
   if (result.length === 0) {
     return res.status(200).json([]);
   }
   return res.status(200).json(result);
+});
+
+router.get('/search', tokenValidation, async (req, res) => {
+  const { q } = req.query;
+  console.log(q);
+  const result = await readFile(dataPath);
+  if (q === '') return res.status(200).json(result);
+  if (!q) { return res.status(200).json([]); }
+  const resultQ = result.filter((element) => element.name.match(q));
+  res.status(200).json(resultQ);
 });
 
 router.get('/:id', async (req, res) => {
@@ -23,17 +44,6 @@ router.get('/:id', async (req, res) => {
   }
   return res.status(200).json(person);
 });
-
-const tokenValidation = (req, res, next) => {
-  const { authorization } = req.headers;
-  if (!authorization) {
-    return res.status(401).json({ message: 'Token não encontrado' });
-  }
-  if (authorization.length !== 16 || typeof authorization !== 'string') {
-    return res.status(401).json({ message: 'Token inválido' });
-  }
-  next();
-};
 
 const nameValidation = (req, res, next) => {
   const { name } = req.body;
@@ -133,15 +143,18 @@ router.put('/:id',
     res.status(200).json(talker);
   });
 
-  router.delete('/:id',
+router.delete('/:id',
   tokenValidation,
   async (req, res) => {
     const { id } = req.params;
     const data = await readFile(dataPath);
+    // console.log(data);
     const index = data.findIndex((person) => person.id === Number(id));
     data.splice(index, 1);
     await writeData(data, dataPath);
-    res.status(204);
+    // const data2 = await readFile(dataPath);
+    // console.log(data2);
+    return res.status(204);
   });
 
 module.exports = router;
