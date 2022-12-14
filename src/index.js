@@ -1,9 +1,11 @@
 const express = require('express');
 const talkerRoute = require('./routes/talker');
+const loginRoute = require('./routes/login');
 
 const app = express();
 app.use(express.json());
 app.use('/talker', talkerRoute);
+app.use('/login', loginRoute);
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';

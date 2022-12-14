@@ -1,5 +1,4 @@
 const express = require('express');
-const { route } = require('express/lib/application');
 const path = require('path');
 const readFile = require('../utils/readFile');
 
