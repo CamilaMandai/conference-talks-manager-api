@@ -133,4 +133,15 @@ router.put('/:id',
     res.status(200).json(talker);
   });
 
+  router.delete('/:id',
+  tokenValidation,
+  async (req, res) => {
+    const { id } = req.params;
+    const data = await readFile(dataPath);
+    const index = data.findIndex((person) => person.id === Number(id));
+    data.splice(index, 1);
+    await writeData(data, dataPath);
+    res.status(204);
+  });
+
 module.exports = router;
