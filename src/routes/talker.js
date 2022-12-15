@@ -80,18 +80,18 @@ router.put('/:id',
     res.status(200).json(talker);
   });
 
-router.delete('/:id',
-  tokenValidation,
-  async (req, res) => {
+router.delete('/:id', tokenValidation, async (req, res) => {
     const { id } = req.params;
     const data = await readFile(dataPath);
     // console.log(data);
-    const index = data.findIndex((person) => person.id === Number(id));
-    data.splice(index, 1);
-    await writeData(data, dataPath);
+    // const index = data.findIndex((person) => person.id === Number(id));
+    // data.splice(index, 1);
+    const newData = data.filter((element) => element.id !== Number(id));
+    // await writeData(data, dataPath);
+    await writeData(newData, dataPath);
     // const data2 = await readFile(dataPath);
     // console.log(data2);
-    return res.status(204);
+    return res.status(204).json();
   });
 
 module.exports = router;
